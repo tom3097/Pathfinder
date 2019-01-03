@@ -8,6 +8,7 @@ Running docker container:
 
 Ensuring that container initialization is done:
 ```docker logs <container_id>```
+
 If logs contain *Maps data loaded* log, database is ready for using.
 
 Connecting to database from local machine:
