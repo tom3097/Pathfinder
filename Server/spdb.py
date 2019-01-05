@@ -43,10 +43,10 @@ def find_path():
 		time.sleep(3)
 		
 		path = []
-		path.append({'x':17.023,'y':51.52})
+		# path.append({'x':17.023,'y':51.52})
 		path.append({'x':start['x'],'y':start['y']})
 		path.append({'x':end['x'],'y':end['y']})
-		path.append({'x':18.48,'y':52.92})
+		# path.append({'x':18.48,'y':52.92})
 		##############################################################
 		
 		return jsonify(path)
