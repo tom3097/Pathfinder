@@ -36,7 +36,7 @@ init = function(document) {
 showOverlay = function(document) {
 	let overlay = document.getElementById('myOverlay');
 	let app = document.getElementById('myApp');
-	
+
 	overlay.style.display = 'inline';
 	app.style.display = 'inline';
 }
@@ -44,7 +44,7 @@ showOverlay = function(document) {
 hideOverlay = function(document) {
 	let overlay = document.getElementById('myOverlay');
 	let app = document.getElementById('myApp');
-	
+
 	overlay.style.display = 'none';
 	app.style.display = 'block';
 }
@@ -77,7 +77,7 @@ olMap.on('click', function(event) {
 		startPoint.setGeometry(new ol.geom.Point(event.coordinate));
 	} else if (destPoint.getGeometry() == null) {
 		destPoint.setGeometry(new ol.geom.Point(event.coordinate));
-		
+
 		var startCoord = transform(startPoint.getGeometry().getCoordinates());
 		var destCoord = transform(destPoint.getGeometry().getCoordinates());
 		var viewparams = {
@@ -94,7 +94,7 @@ initFindBtn = function(document) {
 		if(!finding && startPoint.getGeometry() != null && destPoint.getGeometry() != null) {
 			finding = true;
 			showOverlay(document);
-			
+
 			const Http = new XMLHttpRequest();
 			const url='http://127.0.0.1:5000/find';
 			Http.open("POST", url, true);
@@ -104,7 +104,7 @@ initFindBtn = function(document) {
 				if (Http.readyState === 4 && Http.status === 200) {
 					var json = JSON.parse(Http.responseText);
 					hideOverlay(document);
-					
+
 					drawPath(json);
 				}
 			};
@@ -121,25 +121,56 @@ initClearBtn = function(document) {
 	});
 }
 
-drawPath = function(points) {	
-	var point1 = points[0];
-	for(var i = 1; i < points.length; ++i) {
-		var point2 = points[i];
-
-		fetch(url_osrm_route + point1.x + ',' + point1.y + ';' + point2.x + ',' + point2.y).then(function(r) {
-			return r.json();
-		}).then(function(json) {
-			// console.log(json);
-			if(json.code === 'Ok' && json.routes.length > 0) {
-				createRoute(json.routes[0].geometry);
-			}
-		});
-		
-		point1 = point2;
+drawPath = function(points) {
+	let locations = new Array();
+	for(let point of points) {
+		locations.push([point.x, point.y]);
 	}
+
+	// locations.map(function(l) {
+	//   return l.reverse();
+	// });
+
+	var route = new ol.geom.LineString(locations).transform('EPSG:4326', 'EPSG:3857');
+
+	// console.log(route);
+
+	var feature = new ol.Feature({
+		type: 'route',
+		geometry: route
+	});
+
+	feature.setStyle(styles.route);
+	vectorSource.addFeature(feature);
+
+	// let line = new Array();
+	// for(let point of points) {
+	// 	line.push(point.x, point.y);
+	// }
+	// console.log(line);
+	// let route = ol.format.Polyline.encodeFloats({numbers : line, factor: 1e5});
+	// console.log("draw: ", route);
+	// createRoute(route);
+
+	// var point1 = points[0];
+	// for(var i = 1; i < points.length; ++i) {
+	// 	var point2 = points[i];
+	//
+	// 	fetch(url_osrm_route + point1.x + ',' + point1.y + ';' + point2.x + ',' + point2.y).then(function(r) {
+	// 		return r.json();
+	// 	}).then(function(json) {
+	// 		// console.log(json);
+	// 		if(json.code === 'Ok' && json.routes.length > 0) {
+	// 			createRoute(json.routes[0].geometry);
+	// 		}
+	// 	});
+	//
+	// 	point1 = point2;
+	// }
 }
 
 createRoute = function(polyline) {
+	console.log(polyline);
 	var route = new ol.format.Polyline({
 		factor: 1e5
 	}).readGeometry(polyline, {
