@@ -37,8 +37,8 @@ showOverlay = function(document) {
 	let overlay = document.getElementById('myOverlay');
 	let app = document.getElementById('myApp');
 
-	overlay.style.display = 'inline';
-	app.style.display = 'inline';
+	overlay.style.display = 'block';
+	app.style.display = 'inline-block';
 }
 
 hideOverlay = function(document) {
