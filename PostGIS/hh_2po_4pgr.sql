@@ -1,1 +1,1 @@
--- This file contains sql with data.
+--- This file contains sql with maps data.

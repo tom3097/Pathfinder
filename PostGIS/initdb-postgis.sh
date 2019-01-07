@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
@@ -23,7 +23,12 @@ for DB in spdb_postgis "$POSTGRES_DB"; do
 EOSQL
 done
 
-# Load Maps data into spdb_postgis
-echo "Loading Maps data into $DB"
+# Load Maps data into $POSTGRES_DB
+echo "Loading Maps data into $POSTGRES_DB"
 "${psql[@]}" --dbname="$POSTGRES_DB" --file=/psql-data/hh_2po_4pgr.sql
 echo "Maps data loaded"
+
+# Load Locations data into $POSTGRES_DB
+echo "Loading Locations data into $POSTGRES_DB"
+"${psql[@]}" --dbname="$POSTGRES_DB" --file=/psql-data/locations.sql
+echo "Location data loaded"

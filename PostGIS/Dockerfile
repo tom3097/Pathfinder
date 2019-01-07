@@ -19,3 +19,4 @@ COPY ./initdb-postgis.sh /docker-entrypoint-initdb.d/postgis.sh
 COPY ./update-postgis.sh /usr/local/bin
 RUN mkdir -p /psql-data
 COPY ./hh_2po_4pgr.sql /psql-data/
+COPY ./locations.sql /psql-data/
