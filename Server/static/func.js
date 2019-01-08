@@ -127,13 +127,7 @@ drawPath = function(points) {
 		locations.push([point.x, point.y]);
 	}
 
-	// locations.map(function(l) {
-	//   return l.reverse();
-	// });
-
 	var route = new ol.geom.LineString(locations).transform('EPSG:4326', 'EPSG:3857');
-
-	// console.log(route);
 
 	var feature = new ol.Feature({
 		type: 'route',
@@ -142,31 +136,6 @@ drawPath = function(points) {
 
 	feature.setStyle(styles.route);
 	vectorSource.addFeature(feature);
-
-	// let line = new Array();
-	// for(let point of points) {
-	// 	line.push(point.x, point.y);
-	// }
-	// console.log(line);
-	// let route = ol.format.Polyline.encodeFloats({numbers : line, factor: 1e5});
-	// console.log("draw: ", route);
-	// createRoute(route);
-
-	// var point1 = points[0];
-	// for(var i = 1; i < points.length; ++i) {
-	// 	var point2 = points[i];
-	//
-	// 	fetch(url_osrm_route + point1.x + ',' + point1.y + ';' + point2.x + ',' + point2.y).then(function(r) {
-	// 		return r.json();
-	// 	}).then(function(json) {
-	// 		// console.log(json);
-	// 		if(json.code === 'Ok' && json.routes.length > 0) {
-	// 			createRoute(json.routes[0].geometry);
-	// 		}
-	// 	});
-	//
-	// 	point1 = point2;
-	// }
 }
 
 createRoute = function(polyline) {
