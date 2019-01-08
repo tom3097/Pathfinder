@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<title>Pathfinder - SPDB</title>
+	<meta charset="utf-8">
+	<script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+	<link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Raleway" />
+
+	<script src="http://127.0.0.1:5000/script"></script>
+	<link rel="stylesheet" href="http://127.0.0.1:5000/style">
+	</head>
+	<body>
+		<div id="myOverlay">
+			<div id="loading-img"></div>
+		</div>
+
+		<div id="myApp">
+			<h1><span data-shadow-text="Find Your Path">Find Your Path</span></h1>
+
+			<div class="btn-group-vertical" style="padding-left: 0.5%;float: left;font: 600 1.0em/1 'Raleway', sans-serif;width: 6%;">
+			  <button id="find_path" type="button" class="btn btn-primary" style="background-color: #FAEBD7;border-color: #8B4513;color: #333;font-size: 0.8vw;">Find path</button>
+				<button id="clear" type="button" class="btn btn-primary" style="background-color: #FAEBD7;border-color: #8B4513;color: #333;font-size: 0.8vw;">Clear</button>
+			</div>
+
+			<div style="width: 92.5%;padding-left: 0.2%;float: left;">
+				<div id="map"></div>
+			</div>
+		</div>
+
+		<script type="text/javascript">
+		init(document);
+		initMap('map');
+		initFindBtn(document);
+		initClearBtn(document);
+		</script>
+	</body>
+</html>
