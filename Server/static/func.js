@@ -97,8 +97,34 @@ olMap.on('click', function(event) {
 initFindBtn = function(document) {
 	var findButton = document.getElementById('find_path');
 	findButton.addEventListener('click', function(event) {
-		if(!finding && startPoint.getGeometry() != null && destPoint.getGeometry() != null) {
+		if(startPoint.getGeometry() == null) {
+			alert("Define start point");
+			return;
+		}
+		if(destPoint.getGeometry() == null) {
+			alert("Define end point");
+			return;
+		}
+		let timeInput = document.getElementById('time');
+		console.log(timeInput);
+		if(timeInput.value === "" || isNaN(timeInput.value)) {
+			alert("Define additional time");
+			return;
+		}
+		let distanceInput = document.getElementById('distance');
+		if(distanceInput.value === "" || isNaN(distanceInput.value)) {
+			alert("Define additional distance");
+			return;
+		}
+
+		if(!finding) {
 			finding = true;
+			let time = parseInt(timeInput.value);
+			let distance = parseInt(distanceInput.value);
+
+			params.time = time;
+			params.distance = distance;
+
 			showOverlay(document);
 
 			const Http = new XMLHttpRequest();
@@ -111,7 +137,7 @@ initFindBtn = function(document) {
 					var result = JSON.parse(Http.responseText);
 					hideOverlay(document);
 
-					console.log(result);
+					// console.log(result);
 
 					for(let point of result.key_points) {
 						createFeature(point);

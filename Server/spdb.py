@@ -31,7 +31,7 @@ def favicon():
 
 results = []
 routes_list = []
-
+avg_vel = 60 # km/h
 
 @app.route('/find', methods = ['POST'])
 def find_path():
@@ -40,8 +40,14 @@ def find_path():
 
         start = data['viewparams']['start']
         end = data['viewparams']['end']
+        time_limit = data['time'] # hours
+        distance_limit = data['distance'] # km
 
-        run_algorithm(start, end, 2000)
+        distance = distance_limit if distance_limit < time_limit * avg_vel else time_limit * avg_vel
+
+        print("{} {} {} {}".format(distance, distance_limit, time_limit, time_limit * avg_vel))
+
+        run_algorithm(start, end, distance * 1000)
 
         gen_path = []
         for e in routes_list:
@@ -65,7 +71,7 @@ def find_path():
         return jsonify(ret)
 
 db = PostGisDB(host="localhost", port="5433", database="postgres",
-                user="postgres", password="")
+                user="postgres", password="mysecretpassword")
 
 A = 1.0
 B = 10.0
