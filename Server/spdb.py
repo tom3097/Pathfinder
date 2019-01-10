@@ -41,14 +41,7 @@ def find_path():
         start = data['viewparams']['start']
         end = data['viewparams']['end']
 
-        ##############################################################
-        ####### TUTAJ WYSZUKIWANIE SCIEZKI I ZWROCENIE WYNIKU ########
-        ##############################################################
-        # testowe ponizej
-        # print("start: {}, end: {}".format(start, end))
-        #time.sleep(3)
-
-        run_algorithm(start, end, 0)
+        run_algorithm(start, end, 2000)
 
         gen_path = []
         for e in routes_list:
@@ -58,26 +51,21 @@ def find_path():
             #print(points[-1])
             gen_path.extend(points)
 
-        print("GENPATH")
-        print(gen_path)
-        #path = results
-        path = gen_path[0]
-        for a in gen_path:
-            if len(a) > len(path):
-                path = a
-        #print(path)
-        print("PATH")
-        print(path)
-        # path.append({'x':17.023,'y':51.52})
-        #path.append({'x':start['x'],'y':start['y']})
-        #path.append({'x':end['x'],'y':end['y']})
-        # path.append({'x':18.48,'y':52.92})
-        ##############################################################
+        # print("GENPATH")
+        # print(gen_path)
+        # path = gen_path[0]
+        # for a in gen_path:
+        #     if len(a) > len(path):
+        #         path = a
+        # print("PATH")
+        # print(path)
 
-        return jsonify(path)
+        ret = { 'key_points': results, 'route': gen_path }
+
+        return jsonify(ret)
 
 db = PostGisDB(host="localhost", port="5433", database="postgres",
-                user="postgres", password="mysecretpassword")
+                user="postgres", password="")
 
 A = 1.0
 B = 10.0

@@ -1,4 +1,4 @@
-var url_osrm_route = '//router.project-osrm.org/route/v1/driving/';
+var icon_url = '//cdn.rawgit.com/openlayers/ol3/master/examples/data/icon.png';
 var vectorSource = new ol.source.Vector();
 var vectorLayer = new ol.layer.Vector({
 	source: vectorSource
@@ -8,7 +8,13 @@ var styles = {
 		stroke: new ol.style.Stroke({
 			width: 6, color: [40, 40, 40, 0.8]
 		})
-	})
+	}),
+  icon: new ol.style.Style({
+    image: new ol.style.Icon({
+      anchor: [0.5, 1],
+      src: icon_url
+    })
+  })
 };
 
 var olMap = new ol.Map({
@@ -102,10 +108,18 @@ initFindBtn = function(document) {
 			Http.onreadystatechange = function () {
 				finding = false;
 				if (Http.readyState === 4 && Http.status === 200) {
-					var json = JSON.parse(Http.responseText);
+					var result = JSON.parse(Http.responseText);
 					hideOverlay(document);
 
-					drawPath(json);
+					console.log(result);
+
+					for(let point of result.key_points) {
+						createFeature(point);
+					}
+
+					for(let path of result.route) {
+						drawPath(path);
+					}
 				}
 			};
 		}
@@ -138,18 +152,11 @@ drawPath = function(points) {
 	vectorSource.addFeature(feature);
 }
 
-createRoute = function(polyline) {
-	console.log(polyline);
-	var route = new ol.format.Polyline({
-		factor: 1e5
-	}).readGeometry(polyline, {
-		dataProjection: 'EPSG:4326',
-		featureProjection: 'EPSG:3857'
-	});
-	var feature = new ol.Feature({
-		type: 'route',
-		geometry: route
-	});
-	feature.setStyle(styles.route);
-	vectorSource.addFeature(feature);
+createFeature = function(coord) {
+  var feature = new ol.Feature({
+    type: 'place',
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([coord.x, coord.y]))
+  });
+  feature.setStyle(styles.icon);
+  vectorSource.addFeature(feature);
 }
