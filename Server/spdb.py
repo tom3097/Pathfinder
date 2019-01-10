@@ -41,7 +41,7 @@ def find_path():
         start = data['viewparams']['start']
         end = data['viewparams']['end']
 
-        run_algorithm(start, end, 2000)
+        run_algorithm(start, end, 5000)
 
         gen_path = []
         for e in routes_list:
@@ -65,7 +65,7 @@ def find_path():
         return jsonify(ret)
 
 db = PostGisDB(host="localhost", port="5433", database="postgres",
-                user="postgres", password="")
+                user="postgres", password="mysecretpassword")
 
 A = 1.0
 B = 10.0
@@ -179,13 +179,14 @@ def work(start_point_gis, end_point_gis, route_gis, additional_len):
     routes_to_point = routes_to_point[correct_indexes]
     routes_from_point = routes_from_point[correct_indexes]
     total_lengths = total_lengths[correct_indexes]
+    routes_from_point_lengths = routes_from_point_lengths[correct_indexes]
     chosen_points_heuristics = chosen_points_heuristics[correct_indexes]
 
     diff_dist = routes_from_point_lengths - route_gis.length
-    diff_dist = np.max(diff_dist, 0)
-    chosen_points_heuristics = chosen_points_heuristics + C * diff_dist
+    diff_dist[diff_dist < 0] = 0
+    chosen_points_heuristics2 = chosen_points_heuristics + C * diff_dist
 
-    odw = 1.0 / chosen_points_heuristics
+    odw = 1.0 / chosen_points_heuristics2
     af = odw / np.sum(odw)
 
     #print(total_lengths)
@@ -198,7 +199,11 @@ def work(start_point_gis, end_point_gis, route_gis, additional_len):
         results.append(human_end)
         return
 
-    mid_point_idx = np.random.choice(len(total_lengths), 1, p=af)[0]
+    try:
+        mid_point_idx = np.random.choice(len(total_lengths), 1, p=af)[0]
+    except Exception:
+        print(chosen_points_heuristics)
+        print(af)
     #print("Mid point: {}".format(mid_point_idx))
 
     mid_point = chosen_points[mid_point_idx]
