@@ -147,6 +147,64 @@ class PostGisDB(object):
 
         return coords
 
+    def get_human_readable_route(self, route):
+        """ Gets human readable representation for the given route.
+
+        """
+        query = "SELECT ST_AsText('{}');".format(route.binary)
+        format_string = '(\"<{:d},{:d}>\",{})'
+        format_string2 = 'POINT({:f} {:f})'
+
+        curr = self.connection.cursor()
+        curr.execute(query)
+
+        row = curr.fetchone()[0]
+
+        query2 = "SELECT ST_DumpPoints('{}')".format(row)
+        curr.execute(query2)
+
+        row = curr.fetchall()
+
+        points = []
+
+        lines = {}
+
+        for r in row:
+            #print(r[0])
+            data_line = r[0]
+            data_line = data_line.replace('{', '<').replace('}', '>')
+            #print(data_line)
+
+            data = parse.parse(format_string, data_line)
+            #print(data)
+            line_nr = data[0]
+            if line_nr not  in lines:
+                lines[line_nr] = []
+            gis_point = data[2]
+            query = "SELECT ST_AsText('{}');".format(gis_point)
+            curr.execute(query)
+            pp = parse.parse(format_string2, curr.fetchone()[0])
+            #print(pp)
+            coords = {
+                'x': pp[0],
+                'y': pp[1]
+            }
+            lines[line_nr].append(coords)
+            #print(coords)
+
+        #print(points)
+
+        for key, val in lines.iteritems():
+            #print(val)
+            points.append(val)
+
+        return points
+
+
+
+
+        #print(row)
+
     # def get_points_distance(self, point_1, point_2):
     #     """ Gets distance between two points (in meters).
     #
@@ -215,6 +273,8 @@ def _test_db_queries():
 
     human_readable = db.get_human_readable_point(point_A_gis)
     print(human_readable)
+
+    db.get_human_readable_route(route_gis)
 
 if __name__ == '__main__':
     _test_db_queries()

@@ -30,6 +30,7 @@ def favicon():
                )
 
 results = []
+routes_list = []
 
 
 @app.route('/find', methods = ['POST'])
@@ -47,9 +48,26 @@ def find_path():
         # print("start: {}, end: {}".format(start, end))
         #time.sleep(3)
 
-        run_algorithm(start, end, 5000)
+        run_algorithm(start, end, 0)
 
-        path = results
+        gen_path = []
+        for e in routes_list:
+            points = db.get_human_readable_route(e)
+            #print(points)
+            #print(points[0])
+            #print(points[-1])
+            gen_path.extend(points)
+
+        print("GENPATH")
+        print(gen_path)
+        #path = results
+        path = gen_path[0]
+        for a in gen_path:
+            if len(a) > len(path):
+                path = a
+        #print(path)
+        print("PATH")
+        print(path)
         # path.append({'x':17.023,'y':51.52})
         #path.append({'x':start['x'],'y':start['y']})
         #path.append({'x':end['x'],'y':end['y']})
@@ -79,6 +97,7 @@ def work(start_point_gis, end_point_gis, route_gis, additional_len):
 
     near_points_gis, near_route_dists = db.get_locations_near_route(route_gis, additional_len)
     if len(near_points_gis) == 0:
+        routes_list.append(route_gis)
         print("Nie ma potencjalnych punktowe near")
         print("End point: {}".format(end_point_gis))
         results.append(human_end)
@@ -107,6 +126,7 @@ def work(start_point_gis, end_point_gis, route_gis, additional_len):
     near_route_dists = near_route_dists[correct_indexes]
 
     if len(near_points_gis) == 0:
+        routes_list.append(route_gis)
         print("Po odfiltrowaniu punktow dalszych nie ma near points")
         print("End point: {}".format(end_point_gis))
         results.append(human_end)
@@ -157,6 +177,7 @@ def work(start_point_gis, end_point_gis, route_gis, additional_len):
     routes_to_point = np.array(routes_to_point)
     routes_from_point = np.array(routes_from_point)
     if len(routes_from_point) == 0:
+        routes_list.append(route_gis)
         print("Dijsktra nie znalazl polaczen")
         print("End point: {}".format(end_point_gis))
         results.append(human_end)
@@ -183,6 +204,7 @@ def work(start_point_gis, end_point_gis, route_gis, additional_len):
     #print(af)
 
     if len(routes_from_point) == 0:
+        routes_list.append(route_gis)
         print("Brak kandydatow, koniec algorytmu")
         print("End point: {}".format(end_point_gis))
         results.append(human_end)
@@ -199,13 +221,17 @@ def work(start_point_gis, end_point_gis, route_gis, additional_len):
     mid_point_len = total_lengths[mid_point_idx]
 
     add_len_2 = route_gis.length + additional_len - mid_point_len
+    route_to_mid_point = routes_to_point[mid_point_idx]
+    routes_list.append(route_to_mid_point)
     new_route = routes_from_point[mid_point_idx]
 
     work(mid_point, end_point_gis, new_route, add_len_2)
 
 def run_algorithm(start, end, additional_len):
     global results
+    global routes_list
     results = []
+    routes_list = []
 
     start_point_gis = db.get_nearest_start_point(start['x'], start['y'])
     end_point_gis = db.get_nearest_end_point(end['x'], end['y'])
