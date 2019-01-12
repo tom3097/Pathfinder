@@ -178,9 +178,15 @@ class PostGisDB(object):
             data = parse.parse(format_string, data_line)
             #print(data)
             try:
+                # przy takim case leci error: (<1>,01010000008CBE823463773140AFD7AA1386564A40) = data_line
+                # generalnie jest to 1 punkt, ktory nie wyznacza (nie definiuje) trasy, wiec wydaje mi sie
+                # ze mozna go pominac przy rysowaniu
                 line_nr = data[0]
             except Exception:
+                print('!!!!!!!!!!!!!!!!!!EXCEPTION: otrzymano multiline skladajace sie tylko z jednego punktyu!!!!!!!!!!!!!!!!!!')
+                print(data)
                 print(data_line)
+                continue
             if line_nr not  in lines:
                 lines[line_nr] = []
             gis_point = data[2]
