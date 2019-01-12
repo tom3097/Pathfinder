@@ -177,7 +177,10 @@ class PostGisDB(object):
 
             data = parse.parse(format_string, data_line)
             #print(data)
-            line_nr = data[0]
+            try:
+                line_nr = data[0]
+            except Exception:
+                print(data_line)
             if line_nr not  in lines:
                 lines[line_nr] = []
             gis_point = data[2]

@@ -5,6 +5,11 @@ import io
 from postgisdb import PostGisDB, GisPoint
 import numpy as np
 
+from pathfinder import Pathfinder
+
+pat = Pathfinder(host="localhost", port="5433", database="postgres",
+                user="postgres", password="mysecretpassword")
+
 app = Flask(__name__, static_url_path='/static')
 
 @app.route('/')
@@ -47,15 +52,16 @@ def find_path():
 
         print("{} {} {} {}".format(distance, distance_limit, time_limit, time_limit * avg_vel))
 
-        run_algorithm(start, end, distance * 1000)
-
-        gen_path = []
-        for e in routes_list:
-            points = db.get_human_readable_route(e)
-            #print(points)
-            #print(points[0])
-            #print(points[-1])
-            gen_path.extend(points)
+     #   run_algorithm(start, end, distance * 1000)
+        pat.run(start, end, distance * 1000)
+        #
+        # gen_path = []
+        # for e in routes_list:
+        #     points = db.get_human_readable_route(e)
+        #     #print(points)
+        #     #print(points[0])
+        #     #print(points[-1])
+        #     gen_path.extend(points)
 
         # print("GENPATH")
         # print(gen_path)
@@ -66,7 +72,7 @@ def find_path():
         # print("PATH")
         # print(path)
 
-        ret = { 'key_points': results, 'route': gen_path }
+        ret = { 'key_points': pat.locations, 'route': pat.routes }
 
         return jsonify(ret)
 
