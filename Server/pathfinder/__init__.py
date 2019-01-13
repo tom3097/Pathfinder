@@ -1,1 +1,1 @@
-from pathfinder import Pathfinder
+from pathfinder.pathfinder import Pathfinder

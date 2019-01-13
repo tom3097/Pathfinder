@@ -1,21 +1,23 @@
-from postgisdb import PostGisDB
+from postgisdb import PostGisDB, GisPoint, GisRoute
 import numpy as np
+from typing import List, Dict
 
 
 class Pathfinder(object):
     A = 1.0
     B = 10.0
     C = 1.0
-    M = 10
+    M = 1
 
-    def __init__(self, host, port, database, user, password):
-        self.routes = []
-        self.locations = []
+    def __init__(self, host: str, port: str, database: str, user: str, password: str):
+        self.routes: List[List[Dict[str, float]]] = []
+        self.locations: List[Dict[str, float]] = []
         self.db = PostGisDB(host=host, port=port, database=database,
                             user=user, password=password)
 
-    def __proceed(self, start_point_gis, end_point_gis, route_gis, additional_len):
-        print("Start point: {}".format(start_point_gis))
+    def __proceed(self, start_point_gis: GisPoint, end_point_gis: GisPoint, route_gis: GisRoute,
+                  additional_len: float):
+        print("Current point: {}".format(start_point_gis))
         print("Route length (meters): {}".format(route_gis.length))
         print("Additional length: {}".format(additional_len))
         print("---------------------------------------------------")
@@ -46,7 +48,7 @@ class Pathfinder(object):
         start_distances = np.array(start_distances)
         end_distances = np.array(end_distances)
 
-        correct_indexes = end_distances < start_end_distance
+        correct_indexes = end_distances < start_end_distance  # type: ignore
 
         near_rp_gis = near_rp_gis[correct_indexes]
         near_rp_dist = near_rp_dist[correct_indexes]
@@ -67,7 +69,7 @@ class Pathfinder(object):
         alpha = route_gis.length / float(additional_len) * Pathfinder.A
         beta = additional_len / float(route_gis.length) * Pathfinder.B
 
-        heuristic_cost = near_rp_dist * alpha + start_distances * beta
+        heuristic_cost = near_rp_dist * alpha + start_distances * beta  # type: ignore
         loc_candidate_indexes = heuristic_cost.argsort()[:Pathfinder.M]
 
         loc_candidate_points_gis = near_rp_gis[loc_candidate_indexes]
@@ -120,7 +122,7 @@ class Pathfinder(object):
             self.locations.append(hr_end)
             return
 
-        correct_indexes = total_lengths <= route_gis.length + additional_len
+        correct_indexes = total_lengths <= route_gis.length + additional_len  # type: ignore
 
         routes_to_location = routes_to_location[correct_indexes]
         routes_from_location = routes_from_location[correct_indexes]
@@ -144,14 +146,14 @@ class Pathfinder(object):
             self.locations.append(hr_end)
             return
 
-        penalty_cost = routes_from_location_lengths - route_gis.length
-        penalty_cost[penalty_cost < 0] = 0
-        routes_heuristic_cost = lc_heuristic_cost + Pathfinder.C * penalty_cost
+        penalty_cost = routes_from_location_lengths - route_gis.length  # type: ignore
+        penalty_cost[penalty_cost < 0] = 0  # type: ignore
+        routes_heuristic_cost = lc_heuristic_cost + Pathfinder.C * penalty_cost  # type: ignore
 
         inverse_cost = 1.0 / routes_heuristic_cost
-        probs = inverse_cost / np.sum(inverse_cost)
+        probabilities = inverse_cost / np.sum(inverse_cost)
 
-        chosen_location_index = np.random.choice(len(lc_points_gis), 1, p=probs)[0]
+        chosen_location_index = np.random.choice(len(lc_points_gis), 1, p=probabilities)[0]
         chosen_location = lc_points_gis[chosen_location_index]
 
         new_additional_len = route_gis.length + additional_len - total_lengths[chosen_location_index]
@@ -162,7 +164,7 @@ class Pathfinder(object):
 
         self.__proceed(chosen_location, end_point_gis, new_route_gis, new_additional_len)
 
-    def run(self, start, end, additional_len):
+    def run(self, start: Dict[str, float], end: Dict[str, float], additional_len: float):
         self.locations = []
         self.routes = []
 
