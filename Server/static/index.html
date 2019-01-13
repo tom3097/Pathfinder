@@ -24,14 +24,14 @@
 				<form>
 
 			    <div class="group" style="border-color: #8B4513;color: #333;font-size: 0.8vw;">
-			      <input type="number" id="time" required>
+			      <input type="number" id="time" min="0" required>
 			      <span class="highlight"></span>
 			      <!-- <span class="bar"></span> -->
 			      <label>Hours</label>
 			    </div>
 
 			    <div class="group" style="border-color: #8B4513;color: #333;font-size: 0.8vw;">
-			      <input type="number" id="distance" required>
+			      <input type="number" id="distance" min="0" required>
 			      <span class="highlight"></span>
 			      <!-- <span class="bar"></span> -->
 			      <label>Km</label>
@@ -45,7 +45,7 @@
 				</div>
 			</div>
 
-			<div style="width: 92.5%;padding-left: 0.2%;float: left;">
+			<div style="width: 85%;padding-left: 2%;float: left;">
 				<div id="map"></div>
 			</div>
 		</div>
