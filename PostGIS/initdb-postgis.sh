@@ -6,7 +6,7 @@ set -e
 export PGUSER="$POSTGRES_USER"
 
 # Create the 'spdb_postgis' template db
-"${psql[@]}" <<- 'EOSQL'
+psql <<- 'EOSQL'
 CREATE DATABASE spdb_postgis;
 UPDATE pg_database SET datistemplate = TRUE WHERE datname = 'spdb_postgis';
 EOSQL
@@ -14,7 +14,7 @@ EOSQL
 # Load PostGIS into both spdb_database and $POSTGRES_DB
 for DB in spdb_postgis "$POSTGRES_DB"; do
 	echo "Loading PostGIS extensions into $DB"
-	"${psql[@]}" --dbname="$DB" <<-'EOSQL'
+	psql --dbname="$DB" <<-'EOSQL'
 		CREATE EXTENSION IF NOT EXISTS postgis;
 		CREATE EXTENSION IF NOT EXISTS postgis_topology;
 		CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
@@ -25,10 +25,10 @@ done
 
 # Load Maps data into $POSTGRES_DB
 echo "Loading Maps data into $POSTGRES_DB"
-"${psql[@]}" --dbname="$POSTGRES_DB" --file=/psql-data/hh_2po_4pgr.sql
+psql --dbname="$POSTGRES_DB" --file=/psql-data/hh_2po_4pgr.sql
 echo "Maps data loaded"
 
 # Load Locations data into $POSTGRES_DB
 echo "Loading Locations data into $POSTGRES_DB"
-"${psql[@]}" --dbname="$POSTGRES_DB" --file=/psql-data/locations.sql
+psql --dbname="$POSTGRES_DB" --file=/psql-data/locations.sql
 echo "Location data loaded"
