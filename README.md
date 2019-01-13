@@ -1,3 +1,3 @@
 # Pathfinder
 
-University Project for SPDB subject.
+University project for SPDB subject.
