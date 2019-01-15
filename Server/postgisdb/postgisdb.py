@@ -34,6 +34,11 @@ class PostGisDB(object):
                            "SELECT id, source, target, km as cost FROM hh_2po_4pgr', " \
                            "{}, {}, false) AS route1 LEFT JOIN hh_2po_4pgr as route2 " \
                            "ON (route1.edge = route2.id) ORDER BY seq));"
+    UNION_ROUTE_QUERY = "SELECT ST_Union(%s);"
+    ROUTE_TIME_QUERY = "SELECT geom_way, km / kmh as time FROM pgr_dijkstra('" \
+        			   "SELECT id, source, target, km as cost FROM hh_2po_4pgr', " \
+        			   "1, 5, false) AS route1 LEFT JOIN hh_2po_4pgr as route2 " \
+		               "ON (route1.edge = route2.id) ORDER BY seq;"
     ROUTE_LENGTH_QUERY = "SELECT ST_Length('{}'::geography);"
     LOCATIONS_NEAR_ROUTE_QUERY = "SELECT * FROM (SELECT id, geom_coords, ST_Distance" \
                                  "('{}'::geography, geom_coords::geography) AS dist FROM " \
@@ -68,10 +73,23 @@ class PostGisDB(object):
 
     def get_shortest_route(self, point_1: GisPoint, point_2: GisPoint) -> Optional[GisRoute]:
         curr = self.connection.cursor()
-        curr.execute(PostGisDB.SHORTEST_ROUTE_QUERY.format(point_1.p_id, point_2.p_id))
+
+        curr.execute(PostGisDB.ROUTE_TIME_QUERY.format(point_1.p_id, point_2.p_id))
+        routes_times = curr.fetchall()
+        routes = [route[0] for route in routes_times[:-1]]
+        time = 0
+        for route in routes_times[:-1]:
+            time += route[1]
+
+        curr.execute(PostGisDB.UNION_ROUTE_QUERY, (routes, ))
         route = curr.fetchone()[0]
         if route is None:
             return None
+
+        # curr.execute(PostGisDB.SHORTEST_ROUTE_QUERY.format(point_1.p_id, point_2.p_id))
+        # route = curr.fetchone()[0]
+        # if route is None:
+        #     return None
 
         curr.execute(PostGisDB.ROUTE_LENGTH_QUERY.format(route))
         route_len = curr.fetchone()[0]
