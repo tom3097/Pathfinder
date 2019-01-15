@@ -37,7 +37,7 @@ class PostGisDB(object):
     UNION_ROUTE_QUERY = "SELECT ST_Union(%s);"
     ROUTE_TIME_QUERY = "SELECT geom_way, km / kmh as time FROM pgr_dijkstra('" \
         			   "SELECT id, source, target, km as cost FROM hh_2po_4pgr', " \
-        			   "1, 5, false) AS route1 LEFT JOIN hh_2po_4pgr as route2 " \
+        			   "{}, {}, false) AS route1 LEFT JOIN hh_2po_4pgr as route2 " \
 		               "ON (route1.edge = route2.id) ORDER BY seq;"
     ROUTE_LENGTH_QUERY = "SELECT ST_Length('{}'::geography);"
     LOCATIONS_NEAR_ROUTE_QUERY = "SELECT * FROM (SELECT id, geom_coords, ST_Distance" \
