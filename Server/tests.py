@@ -13,7 +13,7 @@ SHORTEST_ROUTE_QUERY = "SELECT agg_cost FROM pgr_dijkstra(" \
 connection = None
 
 shortest_len = 0    # km
-distance = 250       # km   # 30, 100, 250
+distance = 20       # km   # 30, 100, 250
 time = 2            # hours
 
 def queryPoints(query):
@@ -23,6 +23,7 @@ def queryPoints(query):
     return [point[0] for point in points]
 
 def computePathsLen(points):
+    global shortest_len
     curr = connection.cursor()
     curr.execute(SHORTEST_ROUTE_QUERY.format(points[0], points[-1]))
     shortest_len = curr.fetchall()[-1][0]
@@ -31,7 +32,7 @@ def computePathsLen(points):
     print("==================================================")
 
     paths = {}
-    with open('./tests/test3.json') as f:
+    with open('./tests/test1.json') as f:
         paths = json.loads(f.read())
 
     print(paths)
@@ -84,6 +85,9 @@ def pathLen(path, costs):
             return length
 
 def dfs_paths(graph, start, goal, costs):
+    global distance
+    global shortest_len
+
     stack = [(start, [start])]
     while stack:
         (vertex, path) = stack.pop()
@@ -97,6 +101,7 @@ def dfs_paths(graph, start, goal, costs):
                 stack.append((next, path + [next]))
 
 def test(points):
+    global distance
     print("==================================================")
     print(points)
     graph = buildGraph(points)
@@ -122,13 +127,15 @@ def test(points):
     print("==================================================")
     print("{} - {}".format(longest_path, max_length))
     print("==================================================")
+    print("additional distance {}".format(distance))
+    print("==================================================")
 
 if __name__ == '__main__':
-    # connection = psycopg2.connect(host='localhost', port=5432, database='osm_pgr',
-    #                                    user='postgres', password='123abc')
-    connection = psycopg2.connect(host="localhost", port="5436", database="postgres",
-                                       user="postgres", password="mysecretpassword")
-    # test(queryPoints(SELECT_POINTS_TEST1))
+    connection = psycopg2.connect(host='localhost', port=5432, database='osm_pgr',
+                                       user='postgres', password='123abc')
+    # connection = psycopg2.connect(host="localhost", port="5436", database="postgres",
+    #                                    user="postgres", password="mysecretpassword")
+    test(queryPoints(SELECT_POINTS_TEST1))
     # test(queryPoints(SELECT_POINTS_TEST2))
-    test(queryPoints(SELECT_POINTS_TEST3))
+    # test(queryPoints(SELECT_POINTS_TEST3))
     connection.close()
