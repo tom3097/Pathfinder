@@ -13,7 +13,7 @@ SHORTEST_ROUTE_QUERY = "SELECT agg_cost FROM pgr_dijkstra(" \
 connection = None
 
 shortest_len = 0    # km
-distance = 20       # km   # 30, 100, 250
+distance = 5       # km
 time = 2            # hours
 
 def queryPoints(query):
