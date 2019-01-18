@@ -47,6 +47,7 @@ def find_path():
         distance_limit = data['distance']  # km
 
         time_start = time.time()
+        # Uruchomienie procedury podstawowej - procedura RUN
         pathfinder.run(start, end, distance_limit * 1000, time_limit)
         time_end = time.time()
         print('Total time (in minutes): {}'.format((time_end - time_start)/60.0))
@@ -54,6 +55,7 @@ def find_path():
         print('Additional len left: {}'.format(pathfinder.additional_len))
         print('Additional time left: {}'.format(pathfinder.additional_time))
 
+        # Sprawdzenie, czy zostalo wykorzystane co najmniej 80% dodatkowych kilometrow
         if pathfinder.additional_len / float(distance_limit * 1000) <= 0.2 or pathfinder.additional_len <= 2000:
             ret = {
                 'key_points': pathfinder.locations,
@@ -68,6 +70,7 @@ def find_path():
         routes_backup = pathfinder.routes
 
         time_start = time.time()
+        # Uruchomienie procedury wyjatkowej - procedura RUN_WITH_FIRST_RANDOM
         pathfinder.run_with_first_random(start, end, distance_limit * 1000, time_limit)
         time_end = time.time()
         print('Total time (in minutes): {}'.format((time_end - time_start)/60.0))
