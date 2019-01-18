@@ -8,9 +8,6 @@ from pathfinder import Pathfinder
 app = Flask(__name__, static_url_path='/static')
 
 
-AVG_VEL = 60  # km/h
-
-
 @app.route('/')
 @app.route('/index')
 def index():
