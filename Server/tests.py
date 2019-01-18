@@ -12,9 +12,10 @@ SHORTEST_ROUTE_QUERY = "SELECT agg_cost FROM pgr_dijkstra(" \
 
 connection = None
 
-shortest_len = 0    # km
-distance = 5       # km
-time = 2            # hours
+shortest_len = 0  # km
+distance = 5  # km
+time = 2  # hours
+
 
 def queryPoints(query):
     curr = connection.cursor()
@@ -22,45 +23,22 @@ def queryPoints(query):
     points = curr.fetchall()
     return [point[0] for point in points]
 
+
 def computePathsLen(points):
     global shortest_len
     curr = connection.cursor()
     curr.execute(SHORTEST_ROUTE_QUERY.format(points[0], points[-1]))
     shortest_len = curr.fetchall()[-1][0]
-    print("==================================================")
-    print("A -> B : {}".format(shortest_len))
-    print("==================================================")
-
-    paths = {}
+    print('==================================================')
+    print('A -> B : {}'.format(shortest_len))
+    print('==================================================')
     with open('./tests/test1.json') as f:
         paths = json.loads(f.read())
-
     print(paths)
-
-    # for i in range(0, len(points)):
-    #     pointA = points[i]
-    #
-    #     paths.update({pointA : {}})
-    #
-    #     rest_points = list(points)
-    #     del rest_points[i]
-    #     for pointB in rest_points:
-    #         curr = connection.cursor()
-    #         curr.execute(SHORTEST_ROUTE_QUERY.format(pointA, pointB))
-    #         res = curr.fetchall()
-    #         length = 0
-    #         if len(res) == 0:
-    #             length = distance * distance
-    #         else:
-    #             length = res[-1][0]
-    #         paths[pointA].update({pointB : length})
-    #
-    #     print("{}: {}".format(pointA, paths[pointA]))
     print("==================================================")
 
-    # print(json.dumps(paths, ensure_ascii=False))
-
     return paths
+
 
 def buildGraph(points):
     graph = {}
@@ -76,6 +54,7 @@ def buildGraph(points):
 
     return graph
 
+
 def pathLen(path, costs):
     length = 0
     for i in range(0, len(path)):
@@ -84,6 +63,7 @@ def pathLen(path, costs):
         else:
             return length
 
+
 def dfs_paths(graph, start, goal, costs):
     global distance
     global shortest_len
@@ -91,7 +71,7 @@ def dfs_paths(graph, start, goal, costs):
     stack = [(start, [start])]
     while stack:
         (vertex, path) = stack.pop()
-        for next in graph[vertex]: # - set(path):
+        for next in graph[vertex]:  # - set(path):
             if pathLen(path + [next], costs) > (shortest_len + distance):
                 continue
 
@@ -100,17 +80,17 @@ def dfs_paths(graph, start, goal, costs):
             else:
                 stack.append((next, path + [next]))
 
+
 def test(points):
     global distance
-    print("==================================================")
+    print('==================================================')
     print(points)
     graph = buildGraph(points)
-    print("==================================================")
+    print('==================================================')
     print(graph)
     costs = computePathsLen(points)
     paths = list(dfs_paths(graph, points[0], points[-1], costs))
 
-    longest_path = []
     max_length = 0
     for path in paths:
         length = 0
@@ -119,22 +99,21 @@ def test(points):
                 length += costs[str(path[i])][str(path[i+1])]
             else:
                 break
-        print("==================================================")
+        print('==================================================')
         print("{} - {}".format(path, length))
         if max_length < length:
             max_length = length
             longest_path = list(path)
-    print("==================================================")
-    print("{} - {}".format(longest_path, max_length))
-    print("==================================================")
-    print("additional distance {}".format(distance))
-    print("==================================================")
+    print('==================================================')
+    print('{} - {}'.format(longest_path, max_length))
+    print('==================================================')
+    print('additional distance {}'.format(distance))
+    print('==================================================')
+
 
 if __name__ == '__main__':
     connection = psycopg2.connect(host='localhost', port=5432, database='osm_pgr',
                                        user='postgres', password='123abc')
-    # connection = psycopg2.connect(host="localhost", port="5436", database="postgres",
-    #                                    user="postgres", password="mysecretpassword")
     test(queryPoints(SELECT_POINTS_TEST1))
     # test(queryPoints(SELECT_POINTS_TEST2))
     # test(queryPoints(SELECT_POINTS_TEST3))
