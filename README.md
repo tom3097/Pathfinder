@@ -1,3 +1,3 @@
 # Pathfinder
 
-University project for SPDB subject. :poo:
+University project for SPDB subject. :poop:
